@@ -7,7 +7,8 @@ from matplotlib import pyplot as plt
 
 import cv2
 
-import utils
+from vrgaze.utils import degrees_to_pixels, scale_durations
+# import utils
 import os,sys
 
 def read_sem_map(img_mat_file):
@@ -25,14 +26,17 @@ def zscore_sem_map(map_array):
     
     return zscore_array
 
-def plot_sem_map(map_array,image_path,image_width,image_height):
+def plot_sem_map(map_array,image_path,image_width,image_height,map_type = 'Unspecified', fig_size = (12,6)):
+    image_name = os.path.basename(image_path)
     img = cv2.imread(image_path)
     res = cv2.resize(img, dsize=(image_width, image_height), interpolation=cv2.INTER_CUBIC)[..., ::-1]
     
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=fig_size)
     plt.axis('off')
     plt.imshow(res)
     plt.imshow(map_array, alpha=0.6)
+    plt.title(f'{image_name} {map_type}')
+    plt.colorbar(label='Semantic Value')
     
 def calc_sem_map_comparison(first_fix_y,first_fix_x,first_fix_dur, map_path, map_type):
     sem_map = read_sem_map(map_path)
@@ -54,11 +58,11 @@ def run_sem_map_comparison(trial, sem_map_dir,image_width,image_height,num_fixat
     fix_data = trial.get_fixations()
     
     # change to equirect coordinates & scale durations
-    x_pix, y_pix = utils.degrees_to_pixels(fix_data['fix_yaw'], fix_data['fix_pitch'], image_width,image_height)
+    x_pix, y_pix = degrees_to_pixels(fix_data['fix_yaw'], fix_data['fix_pitch'], image_width,image_height)
     x_pix = np.array(x_pix)
     y_pix = np.array(y_pix)
     # scale fixation durations from 0.1 to 1
-    normed_durations = np.array(utils.scale_durations(fix_data['duration']))
+    normed_durations = np.array(scale_durations(fix_data['duration']))
 
     # exclude poles
     valid_idx = np.where(np.logical_and(y_pix>+100, y_pix <+ 900)) 

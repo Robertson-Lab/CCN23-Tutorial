@@ -275,13 +275,31 @@ class vrGazeCore:
                 paths=self.paths) for i, df in enumerate(parsed_data)]
             return parsed_data
 
-    def parsedDataKey(self, parsed_data):
-        parsed_data_key = pd.DataFrame({
-            'parsed_data_idx': [i for i in range(len(parsed_data))],
-            'trial_name': [trial.trial_name for trial in parsed_data],
-            'trial_number': [trial.trial_number for trial in parsed_data]
-        })
-        
+    def parsed_data_key(self, parsed_data):
+        parsed_data_key = pd.DataFrame()
+        scene_idx = 0
+
+        for scene in parsed_data:
+            if hasattr(scene, '__iter__'):
+                scene_data_key = pd.DataFrame({
+                    'scene_idx': scene_idx,
+                    'subject_idx': [idx for idx, trial in enumerate(scene)],
+                    'subject': [trial.subject for trial in scene],
+                    'trial_name': [trial.trial_name for trial in scene],
+                    'trial_number': [trial.trial_number for trial in scene]
+                })
+                parsed_data_key = pd.concat([parsed_data_key, scene_data_key], ignore_index=True)
+                scene_idx += 1
+            else:
+                parsed_data_key = pd.concat([parsed_data_key] + [
+                    pd.DataFrame({
+                        'scene_idx': i,
+                        'subject': trial.subject,
+                        'trial_name': trial.trial_name,
+                        'trial_number': trial.trial_number
+                    }, index=[0]) for i, trial in enumerate(parsed_data)
+                ], ignore_index=True)
+
         return parsed_data_key
     
     def runFindFixations(self, trial, use_dataframe=False):
@@ -710,7 +728,7 @@ class vrGazeCore:
         plt.imshow(res)
         
         plt.errorbar(x_img, y_img, xerr=x_spread, yerr=y_spread, linewidth=2.75, linestyle="None", color='r', zorder=1)
-        plt.scatter(x_img, y_img, s=2.75*sum(fig_size), c=df_fixations['duration'], cmap='hot')
+        plt.scatter(x_img, y_img, s=2.75*sum(fig_size), c=df_fixations['duration'], cmap='jet')
         
         plt.title(image_name)
         
@@ -804,7 +822,7 @@ class vrGazeCore:
             
         return density_map
     
-    def plotFixationDensity(self, density_map, image_path, start_dur, end_dur, alpha=0.6, out_path=None, fig_size=(20,10)):
+    def plotFixationDensity(self, density_map, image_path, start_dur, end_dur, alpha=0.6, out_path=None, fig_size=(20,10), vmin = None, vmax = None):
         
         if image_path is None:
             print(f'No image path provided!')
@@ -819,14 +837,20 @@ class vrGazeCore:
         res = cv2.resize(img, dsize=(self.params.plotting_image_width, self.params.plotting_image_height), interpolation=cv2.INTER_CUBIC)[..., ::-1]
         
         #overlay the heatmap on top of the panoramic image
+        
+        # define colormap range
+        if vmin is None:
+            vmin = density_map.min()
+        if vmax is None:
+            vmax = density_map.max()
 
         fig = plt.figure(figsize=fig_size)
         plt.axis('off')
         plt.imshow(res)
-        plt.imshow(density_map, alpha=alpha)
+        plt.imshow(density_map, alpha=alpha, vmin=vmin, vmax=vmax)
         
         plt.suptitle(image_name)
-        plt.title(f'Duration: {start_dur} to {end_dur} seconds')
+        plt.title(f'Duration: {start_dur} to {end_dur} seconds', fontsize="20")
         
 
         if out_path:
