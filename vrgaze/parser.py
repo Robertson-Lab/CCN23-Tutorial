@@ -121,7 +121,7 @@ def set_paths(args):
 	project_fix_data_dir = os.path.join(project_data_dir, 'fixations')
 	project_fix_pkl_dir = os.path.join(project_fix_data_dir, 'pkl')
 	project_fix_plots_dir = os.path.join(project_fix_data_dir, 'plots')
-	project_heat_dir = os.path.join(project_data_dir, 'heatMaps')
+	project_heat_dir = os.path.join(project_data_dir, 'densityMaps')
 	project_heat_pkl_dir = os.path.join(project_heat_dir, 'pkl')
 	project_heat_plots_dir = os.path.join(project_heat_dir, 'plots')
 
