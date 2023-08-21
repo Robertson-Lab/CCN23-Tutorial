@@ -3,4 +3,6 @@ This repository is for the CCN23 Keynote + Tutorial "Behind the Eyes: Insights i
 
 You can access the Google Colab notebook associated with the tutorial [here](https://colab.research.google.com/drive/1pKCzE57WHw9_ybZ5oLv5wek48QLzcxPw?usp=sharing). 
 
-This repository will be archived after the CCN23 conference. To access the vrGazeCore Toolbox repository, please go [here](https://github.com/Robertson-Lab/vrGazeCore-Toolbox). 
+This repository will be archived after the CCN23 conference. To access the vrGazeCore Toolbox repository, please go [here](https://github.com/Robertson-Lab/vrGazeCore-Toolbox). When using the toolbox, please cite our [CCN Abstract](https://2023.ccneuro.org/view_paper.php?PaperNum=1555).
+
+vrGazeCore was authored by Deepasri Prasad, Amanda J. Haskins, Thomas L. Botch, Jeff Mentch, and Caroline E. Robertson.
